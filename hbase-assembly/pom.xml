@@ -38,6 +38,7 @@
   <build>
     <plugins>
       <!-- licensing info from our dependencies -->
+	  <!--
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-remote-resources-plugin</artifactId>
@@ -67,6 +68,7 @@
           </execution>
         </executions>
       </plugin>
+	  -->
       <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
         <version>${maven.assembly.version}</version>

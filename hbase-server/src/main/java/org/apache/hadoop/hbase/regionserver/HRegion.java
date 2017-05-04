@@ -2899,6 +2899,9 @@ public class HRegion implements HeapSize, PropagatingConfigurationObserver, Regi
     WALKey walKey = null;
     long mvccNum = 0;
     try {
+    	HRegionMutateMetrics metric = new HRegionMutateMetrics();
+        long getLockStart = EnvironmentEdgeManager.currentTime();
+
       // ------------------------------------
       // STEP 1. Try to acquire as many locks as we can, and ensure
       // we acquire at least one.
@@ -3000,6 +3003,8 @@ public class HRegion implements HeapSize, PropagatingConfigurationObserver, Regi
 
       // Nothing to put/delete -- an exception in the above such as NoSuchColumnFamily?
       if (numReadyToWrite <= 0) return 0L;
+      metric.setGetLockCostTime(now - getLockStart);
+      
 
       // We've now grabbed as many mutations off the list as we can
 
@@ -3061,6 +3066,9 @@ public class HRegion implements HeapSize, PropagatingConfigurationObserver, Regi
         doRollBackMemstore = true; // If we have a failure, we need to clean what we wrote
         addedSize += applyFamilyMapToMemstore(familyMaps[i], mvccNum, memstoreCells, isInReplay);
       }
+      long writeMemstoreTime = EnvironmentEdgeManager.currentTime();
+
+      metric.setWriteMemstoreCostTime(writeMemstoreTime-now);
 
       // ------------------------------------
       // STEP 4. Build WAL edit
@@ -3177,7 +3185,11 @@ public class HRegion implements HeapSize, PropagatingConfigurationObserver, Regi
           batchOp.retCodeDetails, batchOp.walEditsFromCoprocessors, firstIndex, lastIndexExclusive);
         coprocessorHost.postBatchMutate(miniBatchOp);
       }
-
+      long end = EnvironmentEdgeManager.currentTime();
+      metric.setSyncWALCostTime(end-writeMemstoreTime);
+      if(end - getLockStart > 100){
+    	  LOG.warn("mutate too slow"+metric);
+      }
 
       // ------------------------------------------------------------------
       // STEP 8. Advance mvcc. This will make this put visible to scanners and getters.

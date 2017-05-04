@@ -2208,6 +2208,7 @@ public class RpcServer implements RpcServerInterface {
       // can't get JSON details, so just report call.toString() along with
       // a more generic tag.
       responseInfo.put("call", call);
+      responseInfo.put("params", params);
       LOG.warn("(response" + tag + "): " + MAPPER.writeValueAsString(responseInfo));
     }
   }

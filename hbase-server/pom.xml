@@ -73,6 +73,7 @@
         </configuration>
       </plugin>
       <!-- licensing info from our bundled works -->
+	  <!--
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-remote-resources-plugin</artifactId>
@@ -103,6 +104,7 @@
           </execution>
         </executions>
       </plugin>
+	  -->
       <!-- Run with -Dmaven.test.skip.exec=true to build -tests.jar without running
         tests (this is needed for upstream projects whose tests need this jar simply for
         compilation) -->
